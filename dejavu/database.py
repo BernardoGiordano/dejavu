@@ -4,6 +4,7 @@ import binascii
 from sqlalchemy import create_engine, Column, Integer, String, Boolean, Binary, ForeignKey, UniqueConstraint
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.pool import QueuePool
 
 Base = declarative_base()
 
@@ -34,7 +35,7 @@ class Database(object):
     def __init__(self, url):
         super(Database, self).__init__()
         self.url = url
-        self.engine = create_engine(url)
+        self.engine = create_engine(url, poolclass=QueuePool, pool_size=20, max_overflow=50)
         self.session = sessionmaker(bind=self.engine)()
         Base.metadata.create_all(self.engine)
 

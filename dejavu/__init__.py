@@ -22,13 +22,13 @@ class Dejavu(object):
     MATCH_TIME = 'match_time'
     OFFSET = 'offset'
 
-    def __init__(self, dburl, fingerprint_limit=None):
+    def __init__(self, database, fingerprint_limit=None):
         """
         :param dburl: string, database url as supported by SQLAlchemy. (RFC-1738)
         :param fingerprint_limit: int, number of seconds (from the start of the music file) to fingerprint
         """
         super(Dejavu, self).__init__()
-        self.db = Database(dburl)
+        self.db = database
         self.limit = fingerprint_limit
         self.get_fingerprinted_songs()
 
