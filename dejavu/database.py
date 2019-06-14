@@ -35,7 +35,7 @@ class Database(object):
     def __init__(self, url):
         super(Database, self).__init__()
         self.url = url
-        self.engine = create_engine(url, poolclass=QueuePool, pool_size=20, max_overflow=50)
+        self.engine = create_engine(url, poolclass=QueuePool, pool_size=20, max_overflow=50, pool_pre_ping=True)
         self.session = sessionmaker(bind=self.engine)()
         Base.metadata.create_all(self.engine)
 
