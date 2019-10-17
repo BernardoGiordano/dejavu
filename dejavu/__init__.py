@@ -18,9 +18,9 @@ logger = logging.getLogger(__name__)
 
 class Dejavu(object):
 
-    CONFIDENCE = 'confidence'
-    MATCH_TIME = 'match_time'
-    OFFSET = 'offset'
+    CONFIDENCE = "confidence"
+    MATCH_TIME = "match_time"
+    OFFSET = "offset"
 
     def __init__(self, dburl, fingerprint_limit=None):
         """
@@ -37,7 +37,7 @@ class Dejavu(object):
         self.songs = self.db.get_songs()
         self.songhashes_set = set()  # to know which ones we've computed before
         for song in self.songs:
-            song_hash = binascii.hexlify(song.file_sha1).upper().decode('utf-8')
+            song_hash = binascii.hexlify(song.file_sha1).upper().decode("utf-8")
             self.songhashes_set.add(song_hash)
 
     def fingerprint_directory(self, path, extensions, nprocesses=None):
@@ -56,19 +56,14 @@ class Dejavu(object):
 
             # don't refingerprint already fingerprinted files
             if decoder.unique_hash(filename) in self.songhashes_set:
-                logger.info(
-                    "%s already fingerprinted, continuing..." % filename
-                )
+                logger.info("%s already fingerprinted, continuing..." % filename)
                 continue
 
             filenames_to_fingerprint.append(filename)
 
         # Prepare _fingerprint_worker input
         worker_input = list(
-            zip(
-                filenames_to_fingerprint,
-                [self.limit] * len(filenames_to_fingerprint)
-            )
+            zip(filenames_to_fingerprint, [self.limit] * len(filenames_to_fingerprint))
         )
 
         # Send off our tasks
@@ -152,18 +147,20 @@ class Dejavu(object):
 
         # return match info
         nseconds = round(
-            float(largest) / fingerprint.DEFAULT_FS *
-            fingerprint.DEFAULT_WINDOW_SIZE * fingerprint.DEFAULT_OVERLAP_RATIO,
-            5
+            float(largest)
+            / fingerprint.DEFAULT_FS
+            * fingerprint.DEFAULT_WINDOW_SIZE
+            * fingerprint.DEFAULT_OVERLAP_RATIO,
+            5,
         )
         song = {
-            'song_id': song_id,
-            'song_name': songname,
-            'relative_confidence': (largest_count*100)/float(songhashes),
+            "song_id": song_id,
+            "song_name": songname,
+            "relative_confidence": (largest_count * 100) / float(songhashes),
             Dejavu.CONFIDENCE: largest_count,
             Dejavu.OFFSET: int(largest),
-            'offset_seconds': nseconds,
-            'file_sha1': binascii.hexlify(song.file_sha1).decode('utf-8'),
+            "offset_seconds": nseconds,
+            "file_sha1": binascii.hexlify(song.file_sha1).decode("utf-8"),
         }
         return song
 
@@ -189,16 +186,13 @@ def _fingerprint_worker(filename, limit=None, song_name=None):
     for channeln, channel in enumerate(channels):
         logger.info(
             (
-                "Fingerprinting channel %d/%d for %s" %
-                (channeln + 1, channel_amount, filename)
+                "Fingerprinting channel %d/%d for %s"
+                % (channeln + 1, channel_amount, filename)
             )
         )
         hashes = fingerprint.fingerprint(channel, Fs=Fs)
         logger.info(
-            (
-                "Finished channel %d/%d for %s" %
-                (channeln + 1, channel_amount, filename)
-            )
+            ("Finished channel %d/%d for %s" % (channeln + 1, channel_amount, filename))
         )
         result |= set(hashes)
 

@@ -1,7 +1,16 @@
 from __future__ import absolute_import
 import binascii
 
-from sqlalchemy import create_engine, Column, Integer, String, Boolean, Binary, ForeignKey, UniqueConstraint
+from sqlalchemy import (
+    create_engine,
+    Column,
+    Integer,
+    String,
+    Boolean,
+    Binary,
+    ForeignKey,
+    UniqueConstraint,
+)
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
@@ -23,12 +32,10 @@ class Fingerprint(Base):
 
     id = Column(Integer, primary_key=True, nullable=False)
     hash = Column(Binary(length=10), nullable=False)
-    song_id = Column(
-        Integer, ForeignKey(Song.id, ondelete="CASCADE"), nullable=False
-    )
+    song_id = Column(Integer, ForeignKey(Song.id, ondelete="CASCADE"), nullable=False)
     offset = Column(Integer, nullable=False)
 
-    unique = UniqueConstraint('hash', 'song_id', 'offset')
+    unique = UniqueConstraint("hash", "song_id", "offset")
 
 
 class Database(object):
@@ -91,9 +98,7 @@ class Database(object):
         for hash, offset in set(hashes):
             fingerprints.append(
                 Fingerprint(
-                    hash=binascii.unhexlify(hash),
-                    song_id=sid,
-                    offset=int(offset)
+                    hash=binascii.unhexlify(hash), song_id=sid, offset=int(offset)
                 )
             )
 
@@ -125,5 +130,5 @@ class Database(object):
         for fingerprint in self.session.query(Fingerprint).filter(
             Fingerprint.hash.in_(values)
         ):
-            hash = binascii.hexlify(fingerprint.hash).upper().decode('utf-8')
+            hash = binascii.hexlify(fingerprint.hash).upper().decode("utf-8")
             yield (fingerprint.song_id, fingerprint.offset - mapper[hash])

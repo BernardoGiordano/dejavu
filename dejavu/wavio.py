@@ -14,8 +14,7 @@ def _wav2array(nchannels, sampwidth, data):
     num_samples, remainder = divmod(len(data), sampwidth * nchannels)
     if remainder > 0:
         raise ValueError(
-            'The length of data is not a multiple of '
-            'sampwidth * num_channels.'
+            "The length of data is not a multiple of " "sampwidth * num_channels."
         )
     if sampwidth > 4:
         raise ValueError("sampwidth must not be greater than 4.")
@@ -24,12 +23,12 @@ def _wav2array(nchannels, sampwidth, data):
         a = _np.empty((num_samples, nchannels, 4), dtype=_np.uint8)
         raw_bytes = _np.fromstring(data, dtype=_np.uint8)
         a[:, :, :sampwidth] = raw_bytes.reshape(-1, nchannels, sampwidth)
-        a[:, :, sampwidth:] = (a[:, :, sampwidth - 1:sampwidth] >> 7) * 255
-        result = a.view('<i4').reshape(a.shape[:-1])
+        a[:, :, sampwidth:] = (a[:, :, sampwidth - 1 : sampwidth] >> 7) * 255
+        result = a.view("<i4").reshape(a.shape[:-1])
     else:
         # 8 bit samples are stored as unsigned ints; others as signed ints.
-        dt_char = 'u' if sampwidth == 1 else 'i'
-        a = _np.fromstring(data, dtype='<%s%d' % (dt_char, sampwidth))
+        dt_char = "u" if sampwidth == 1 else "i"
+        a = _np.fromstring(data, dtype="<%s%d" % (dt_char, sampwidth))
         result = a.reshape(-1, nchannels)
     return result
 
@@ -110,13 +109,13 @@ def writewav24(filename, rate, data):
     a32 = _np.asarray(data, dtype=_np.int32)
     if a32.ndim == 1:
         # Convert to a 2D array with a single column.
-        a32.shape = a32.shape + (1, )
+        a32.shape = a32.shape + (1,)
     # By shifting first 0 bits, then 8, then 16, the resulting output
     # is 24 bit little-endian.
-    a8 = (a32.reshape(a32.shape + (1, )) >> _np.array([0, 8, 16])) & 255
+    a8 = (a32.reshape(a32.shape + (1,)) >> _np.array([0, 8, 16])) & 255
     wavdata = a8.astype(_np.uint8).tostring()
 
-    w = _wave.open(filename, 'wb')
+    w = _wave.open(filename, "wb")
     w.setnchannels(a32.shape[1])
     w.setsampwidth(3)
     w.setframerate(rate)

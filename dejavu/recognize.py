@@ -34,7 +34,7 @@ class FileRecognizer(BaseRecognizer):
         t = time.time() - t
 
         if match:
-            match['match_time'] = t
+            match["match_time"] = t
 
         return match
 
@@ -62,7 +62,7 @@ class MicrophoneRecognizer(BaseRecognizer):
         self,
         channels=default_channels,
         samplerate=default_samplerate,
-        chunksize=default_chunksize
+        chunksize=default_chunksize,
     ):
         self.chunksize = chunksize
         self.channels = channels
@@ -87,7 +87,7 @@ class MicrophoneRecognizer(BaseRecognizer):
         data = self.stream.read(self.chunksize)
         nums = np.fromstring(data, np.int16)
         for c in range(self.channels):
-            self.data[c].extend(nums[c::self.channels])
+            self.data[c].extend(nums[c :: self.channels])
 
     def stop_recording(self):
         self.stream.stop_stream()

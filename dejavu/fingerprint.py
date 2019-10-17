@@ -5,7 +5,9 @@ import matplotlib.mlab as mlab
 import matplotlib.pyplot as plt
 from scipy.ndimage.filters import maximum_filter
 from scipy.ndimage.morphology import (
-    generate_binary_structure, iterate_structure, binary_erosion
+    generate_binary_structure,
+    iterate_structure,
+    binary_erosion,
 )
 import hashlib
 from operator import itemgetter
@@ -73,7 +75,7 @@ def fingerprint(
     wsize=DEFAULT_WINDOW_SIZE,
     wratio=DEFAULT_OVERLAP_RATIO,
     fan_value=DEFAULT_FAN_VALUE,
-    amp_min=DEFAULT_AMP_MIN
+    amp_min=DEFAULT_AMP_MIN,
 ):
     """
     FFT the channel, log transform output, find local maxima, then return
@@ -85,7 +87,7 @@ def fingerprint(
         NFFT=wsize,
         Fs=Fs,
         window=mlab.window_hanning,
-        noverlap=int(wsize * wratio)
+        noverlap=int(wsize * wratio),
     )[0]
 
     # apply log transform since specgram() returns linear array
@@ -106,7 +108,7 @@ def get_2D_peaks(arr2D, plot=False, amp_min=DEFAULT_AMP_MIN):
 
     # find local maxima using our fliter shape
     local_max = maximum_filter(arr2D, footprint=neighborhood) == arr2D
-    background = (arr2D == 0)
+    background = arr2D == 0
     eroded_background = binary_erosion(
         background, structure=neighborhood, border_value=1
     )
@@ -132,8 +134,8 @@ def get_2D_peaks(arr2D, plot=False, amp_min=DEFAULT_AMP_MIN):
         fig, ax = plt.subplots()
         ax.imshow(arr2D)
         ax.scatter(time_idx, frequency_idx)
-        ax.set_xlabel('Time')
-        ax.set_ylabel('Frequency')
+        ax.set_xlabel("Time")
+        ax.set_ylabel("Frequency")
         ax.set_title("Spectrogram")
         plt.gca().invert_yaxis()
         plt.show()
@@ -161,6 +163,6 @@ def generate_hashes(peaks, fan_value=DEFAULT_FAN_VALUE):
                 t_delta = t2 - t1
 
                 if t_delta >= MIN_HASH_TIME_DELTA and t_delta <= MAX_HASH_TIME_DELTA:
-                    key = u"{}|{}|{}".format(freq1, freq2, t_delta)
-                    h = hashlib.sha1(key.encode('utf-8'))
+                    key = "{}|{}|{}".format(freq1, freq2, t_delta)
+                    h = hashlib.sha1(key.encode("utf-8"))
                     yield (h.hexdigest()[0:FINGERPRINT_REDUCTION], t1)
