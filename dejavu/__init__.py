@@ -146,6 +146,7 @@ class Dejavu(object):
         song = self.db.get_song_by_id(song_id)
         if song:
             songname = song.name
+            songhashes = song.hashes
         else:
             return None
 
@@ -158,6 +159,7 @@ class Dejavu(object):
         song = {
             'song_id': song_id,
             'song_name': songname,
+            'relative_confidence': (largest_count*100)/float(songhashes),
             Dejavu.CONFIDENCE: largest_count,
             Dejavu.OFFSET: int(largest),
             'offset_seconds': nseconds,

@@ -15,6 +15,7 @@ class Song(Base):
     name = Column(String(length=255), nullable=False)
     fingerprinted = Column(Boolean, default=False)
     file_sha1 = Column(Binary(length=20), nullable=False)
+    hashes = Column(Integer, nullable=False, default=0)
 
 
 class Fingerprint(Base):
@@ -97,6 +98,9 @@ class Database(object):
             )
 
         self.session.bulk_save_objects(fingerprints)
+        song = self.session.query(Song).filter_by(id=sid).first()
+        song.hashes = len(fingerprints)
+        self.session.commit()
 
     def return_matches(self, hashes):
         """
